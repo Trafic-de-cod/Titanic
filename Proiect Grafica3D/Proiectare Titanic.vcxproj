@@ -152,6 +152,7 @@
     <ClCompile Include="Proiectare Titanic.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
   <ItemGroup>

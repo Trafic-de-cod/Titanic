@@ -1,8 +1,24 @@
 // Proiectare Titanic.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-#include "Shader.h"
+#include "Camera.h"
 
 unsigned int texture1Location;
+
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
+// camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+bool firstMouse = true;
+
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
+
+
 void CreateTextures(const std::string& strExePath)
 {
     // load and create a texture 
@@ -34,16 +50,16 @@ void CreateTextures(const std::string& strExePath)
 void CreateVBOs()
 {
     float vertices[] = {
-        0.0f, 1.0f, 0.0f,       1.0f, 0.0f, 0.0f,   0.5f, 1.0f,     //0
-        -0.25f, 0.75f, 0.0f,    0.0f, 1.0f, 0.0f,   0.25f, 0.75f,   //1
-        0.25f, 0.75f, 0.0f,     0.0f, 0.0f, 1.0f,   0.25f, 0.75f,   //2
-        -0.25f, -0.75f, 0.0f,   1.0f, 0.0f, 0.0f,   0.25f, 0.75f,   //3
-        0.25f,-0.75f,0.0f,      0.0f, 1.0f, 0.0f,   0.0f, 0.0f,     //4
-        0.0f, -1.0f, 0.0f,      0.0f, 0.0f, 1.0f,   0.5f, 0.0f,     //5
+        0.0f, 1.0f, 0.05f,       1.0f, 0.0f, 0.0f,   0.0f, 0.0f,     //0
+        -0.25f, 0.75f, 0.0f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   //1
+        0.25f, 0.75f, 0.0f,     0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   //2
+        -0.25f, -0.75f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   //3
+        0.25f,-0.75f,0.0f,      0.0f, 1.0f, 0.0f,   0.0f, 1.0f,     //4
+        0.0f, -1.0f, 0.05f,      0.0f, 0.0f, 1.0f,   0.5f, 0.0f,     //5
         0.0f, 0.0f, -0.25f,      0.0f, 0.0f, 1.0f,   0.5f, 0.0f,     //6 varf jos
-        -0.25f, 0.75f, -0.25f,    0.0f, 1.0f, 0.0f,   0.25f, 0.75f,   //7
-        0.25f, 0.75f, -0.25f,     0.0f, 0.0f, 1.0f,   0.25f, 0.75f,   //8
-        -0.25f, -0.75f, -0.25f,   1.0f, 0.0f, 0.0f,   0.25f, 0.75f,   //9
+        -0.25f, 0.75f, -0.25f,    0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   //7
+        0.25f, 0.75f, -0.25f,     0.0f, 0.0f, 1.0f,   1.0f, 0.0f,   //8
+        -0.25f, -0.75f, -0.25f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,   //9
         0.25f,-0.75f,-0.25f,      0.0f, 1.0f, 0.0f,   0.0f, 0.0f,     //10
     };
     unsigned int indices[] = {
@@ -94,6 +110,47 @@ void CreateVBOs()
     glEnableVertexAttribArray(2);
 }
 
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, (float)deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, (float)deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, (float)deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, (float)deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+        camera.Reset();
+    }
+}
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
+void scroll_callback(GLFWwindow* window, double xoffset, double yOffset)
+{
+    camera.ProcessMouseScroll(yOffset);
+}
 
 int main(int argc, char** argv)
 {
@@ -115,26 +172,46 @@ int main(int argc, char** argv)
         return -1;
     }
     glfwMakeContextCurrent(win);
+    glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
+    glfwSetCursorPosCallback(win, mouse_callback);
+    glfwSetScrollCallback(win, scroll_callback);
     glewInit();
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     Shader triangleShader("vertexShader.vs", "fragShader.fs");
     
+    
+    glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+    transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     CreateVBOs();
     CreateTextures(strExePath);
 
     while (!glfwWindowShouldClose(win))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        processInput(win);
         glClearColor(0.2f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-        transform = glm::translate(transform, glm::vec3(0.0f, 0.f, -0.5f));
-        triangleShader.Use();
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1Location);
-        unsigned int transformLoc = glGetUniformLocation(triangleShader.GetID(), "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+        triangleShader.Use();
+
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        triangleShader.SetMat4("projection", projection);
+
+        glm::mat4 view = camera.GetViewMatrix();
+        triangleShader.SetMat4("view", view);
+
+
+        transform = glm::rotate(transform, deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
+
+        triangleShader.SetMat4("transform", transform);
+        /*unsigned int transformLoc = glGetUniformLocation(triangleShader.GetID(), "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));*/
+        glActiveTexture(GL_TEXTURE0);
+
         glDrawElements(GL_TRIANGLES, 3*17, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(win);
         glfwPollEvents();
