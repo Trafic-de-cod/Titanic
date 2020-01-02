@@ -28,6 +28,7 @@ class Shader
 public:
 	// constructor generates the shader on the fly
 	// ------------------------------------------------------------------------
+	Shader() = default;
 	Shader(const char* vertexPath, const char* fragmentPath)
 	{
 		Init(vertexPath, fragmentPath);

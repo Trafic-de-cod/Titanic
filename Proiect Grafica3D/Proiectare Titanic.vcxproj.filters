@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Vertex Shaders">
+      <UniqueIdentifier>{b4757b0e-ccc6-4412-aa6e-93ac42dd7a0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fragment Shaders">
+      <UniqueIdentifier>{59c44f06-a714-42ef-a67c-cca8886ffe97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Proiectare Titanic.cpp">
@@ -29,16 +35,28 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="vertexShader.vs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="fragShader.fs">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="skybox.fs">
-      <Filter>Source Files</Filter>
+      <Filter>Vertex Shaders</Filter>
     </None>
     <None Include="skybox.vs">
-      <Filter>Source Files</Filter>
+      <Filter>Vertex Shaders</Filter>
+    </None>
+    <None Include="water.vs">
+      <Filter>Vertex Shaders</Filter>
+    </None>
+    <None Include="fragShader.fs">
+      <Filter>Fragment Shaders</Filter>
+    </None>
+    <None Include="skybox.fs">
+      <Filter>Fragment Shaders</Filter>
+    </None>
+    <None Include="water.fs">
+      <Filter>Fragment Shaders</Filter>
+    </None>
+    <None Include="light.vs">
+      <Filter>Vertex Shaders</Filter>
+    </None>
+    <None Include="light.fs">
+      <Filter>Fragment Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

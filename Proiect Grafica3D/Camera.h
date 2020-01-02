@@ -1,5 +1,9 @@
 #pragma once
-#include"Shader.h"
+#define GLM_FORCE_CTOR_INIT 
+#include <GLM.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+#include<GL/glew.h>
 enum Camera_Movement {
     FORWARD,
     BACKWARD,

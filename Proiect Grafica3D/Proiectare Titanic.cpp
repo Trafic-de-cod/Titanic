@@ -1,8 +1,15 @@
 // Proiectare Titanic.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+#include"Shader.h"
 #include "Camera.h"
 
 unsigned int texture1Location;
+
+unsigned int VBO, VAO, IndBO;
+unsigned int skyboxVAO, skyboxVBO, skyboxIBO;
+unsigned int waterVBO, waterVAO;
+unsigned int cubeVBO, cubeVAO;
+unsigned int lightVAO;
 
 // settings
 const unsigned int SCR_WIDTH = 1900;
@@ -13,54 +20,55 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
+glm::vec3 lightPos(14.0f, 15.0f, 0.0f);
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 float skyboxVertices[] = {
-	// positions          
-	-1.0f,  1.0f, -1.0f,
-	-1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
+    -1.f, -1.f, -1.f, //0
+    1.f,-1.f,-1.f,    //1
+    1.f,-1.f,1.f,     //2
+    -1.f, -1.f, 1.f,  //3
+                      
+    -1.f, 1.f, -1.f,  //4
+    1.f,1.f,-1.f,     //5
+    1.f,1.f,1.f,      //6
+    -1.f,1.f,1.f,     //7
+};
 
-	-1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
+float waterVertices[] =
+{   //position              //color             //normals
+   15.0f, -0.5f,  15.0f, 0.0f, 0.0f, 1.0f,      0.0f, 1.0f, -1.0f,
+   -15.0f, -0.5f,  15.0f,  0.0f, 0.0f, 1.0f,    0.0f, 1.0f, -1.0f,
+   -15.0f, -0.5f, -15.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f, -1.0f,
+                                                            
+   15.0f, -0.5f,  15.0f,  0.0f, 0.0f, 1.0f,     0.0f, 1.0f, -1.0f,
+  -15.0f, -0.5f, -15.0f,  0.0f, 0.0f, 1.0f,     0.0f, 1.0f, -1.0f,
+   15.0f, -0.5f, -15.0f,   0.0f, 0.0f, 1.0f,    0.0f, 1.0f, -1.0f
+};
 
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-
-	-1.0f, -1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
-
-	-1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f, -1.0f,
-
-	-1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f
+unsigned int skyboxIndices[] =
+{
+    //BOTTOM
+    0,1,3,
+    1,2,3,
+    //LEFT
+    0,3,4,
+    3,4,7,
+    //TOP
+    4,5,7,
+    5,6,7,
+    //RIGHT
+    1,2,5,
+    2,5,6,
+    //FRONT
+    0,1,4,
+    1,4,5,
+    //BACK
+    2,3,6,
+    3,6,7
 };
 
 std::vector<std::string> faces
@@ -69,8 +77,8 @@ std::vector<std::string> faces
 	"sea_lf.JPG",
 	"sea_up.JPG",
 	"sea_dn.JPG",
-	"sea_ft.JPG",
-	"sea_bk.JPG"
+	"sea_bk.JPG",
+	"sea_ft.JPG"
 };
 
 unsigned int loadCubemap(std::vector<std::string> faces)
@@ -172,7 +180,7 @@ void CreateVBOs()
         2,4,10
     };
 
-    unsigned int VBO, VAO, IndBO;
+    
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &IndBO);
@@ -239,6 +247,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yOffset)
 
 int main(int argc, char** argv)
 {
+    float KaValue = 0.5;
+    float KdValue = 0.5;
+    float nValue = 8;
     std::string strFullExeFileName = argv[0];
     std::string strExePath;
     const size_t last_slash_idx = strFullExeFileName.rfind('\\');
@@ -262,18 +273,58 @@ int main(int argc, char** argv)
     glfwSetScrollCallback(win, scroll_callback);
     glewInit();
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
 
 	// skybox VAO
-	unsigned int skyboxVAO, skyboxVBO;
+
 	glGenVertexArrays(1, &skyboxVAO);
 	glGenBuffers(1, &skyboxVBO);
+    glGenBuffers(1, &skyboxIBO);
 	glBindVertexArray(skyboxVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(skyboxIndices), skyboxIndices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+    //water vao
+    glGenVertexArrays(1, &waterVAO);
+    glGenBuffers(1, &waterVBO);
+    glBindVertexArray(waterVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, waterVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(waterVertices), waterVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9*sizeof(float), 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9*sizeof(float),(void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    ////lamp vao
+    //glGenVertexArrays(1, &cubeVAO);
+    //glGenBuffers(1, &cubeVBO);
+
+    //glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(lampVertices), lampVertices, GL_STATIC_DRAW);
+
+    //glBindVertexArray(cubeVAO);
+
+    //// position attribute
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
+    //// normal attribute
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    //glEnableVertexAttribArray(1);
+
+    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+    unsigned int lightVAO;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, waterVBO);
+    // note that we update the lamp's position attribute's stride to reflect the updated buffer data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 	// load textures
 	// -------------
 	
@@ -281,15 +332,19 @@ int main(int argc, char** argv)
 
 	// shader configuration
 	// --------------------
-	
+
+    Shader lightingShader("light.vs", "light.fs");
+    Shader lampShader("amp.vs", "lamp.fs");
     Shader triangleShader("vertexShader.vs", "fragShader.fs");
 	Shader skyBoxShader("skybox.vs", "skybox.fs");
+    Shader waterShader("water.vs", "water.fs");
 	skyBoxShader.SetInt("skybox", 0);
+    //lightingShader.Use();
     
     
     glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-    transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+   // transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+   // transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     CreateVBOs();
     CreateTextures(strExePath);
 
@@ -299,29 +354,49 @@ int main(int argc, char** argv)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(win);
-        glClearColor(0.2f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindTexture(GL_TEXTURE_2D, texture1Location);
         triangleShader.Use();
-
+      
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        triangleShader.SetMat4("projection", projection);
-
         glm::mat4 view = camera.GetViewMatrix();
+
+        triangleShader.SetMat4("projection", projection);
         triangleShader.SetMat4("view", view);
 
 
-        transform = glm::rotate(transform, deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
+        //transform = glm::rotate(transform, deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 
         triangleShader.SetMat4("transform", transform);
-        /*unsigned int transformLoc = glGetUniformLocation(triangleShader.GetID(), "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));*/
+
+        glBindVertexArray(VAO);
         glActiveTexture(GL_TEXTURE0);
 
         glDrawElements(GL_TRIANGLES, 3*17, GL_UNSIGNED_INT, 0);
+       //LIGHT
+        lightingShader.Use();
+        lightingShader.SetVec3("objectColor", 0.0f, 0.0f, 1.0f);
+        lightingShader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        lightingShader.SetVec3("lightPos", lightPos);
+        lightingShader.SetMat4("projection", projection);
+        lightingShader.SetMat4("view", view);
+        transform = glm::rotate(glm::mat4(1.0), glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.0f));
+        lightingShader.SetMat4("model", transform);
+        glBindVertexArray(waterVAO);
+        
+
+        //draw water
+        //waterShader.Use();
+        waterShader.SetMat4("projection", projection);
+        waterShader.SetMat4("view", view);
+        waterShader.SetMat4("transform", transform);
+        glBindVertexArray(waterVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 18);
 
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        glEnable(GL_DEPTH_CLAMP);
 		skyBoxShader.Use();
 		view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
 		skyBoxShader.SetMat4("view", view);
@@ -330,13 +405,21 @@ int main(int argc, char** argv)
 		glBindVertexArray(skyboxVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawElements(GL_TRIANGLES, 3 * 12, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
 
         glfwSwapBuffers(win);
         glfwPollEvents();
     }
+    glDeleteVertexArrays(1, &skyboxVAO);
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &waterVAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &IndBO);
+    glDeleteBuffers(1, &waterVBO);
+    glDeleteBuffers(1, &skyboxVBO);
+    glDeleteBuffers(1, &skyboxIBO);
     glfwTerminate();
 }
 
