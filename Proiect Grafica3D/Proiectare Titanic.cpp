@@ -20,7 +20,6 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
-glm::vec3 lightPos(14.0f, 15.0f, 0.0f);
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -143,16 +142,16 @@ void CreateTextures(const std::string& strExePath)
 void CreateVBOs()
 {
     float vertices[] = {
-        0.0f, 1.0f, 0.05f,       1.0f, 0.0f, 0.0f,   0.0f, 0.0f,     //0
+        0.0f, 1.0f, 0.05f,       0.0f, 1.0f, 0.0f,   0.0f, 0.0f,     //0
         -0.25f, 0.75f, 0.0f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   //1
-        0.25f, 0.75f, 0.0f,     0.0f, 0.0f, 1.0f,   1.0f, 1.0f,   //2
-        -0.25f, -0.75f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,   //3
+        0.25f, 0.75f, 0.0f,     0.0f, 1.0f, 1.0f,   1.0f, 1.0f,   //2
+        -0.25f, -0.75f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,   //3
         0.25f,-0.75f,0.0f,      0.0f, 1.0f, 0.0f,   0.0f, 1.0f,     //4
-        0.0f, -1.0f, 0.05f,      0.0f, 0.0f, 1.0f,   0.5f, 0.0f,     //5
-        0.0f, 0.0f, -0.25f,      0.0f, 0.0f, 1.0f,   0.5f, 0.0f,     //6 varf jos
+        0.0f, -1.0f, 0.05f,      0.0f, 1.0f, 0.0f,   0.5f, 0.0f,     //5
+        0.0f, 0.0f, -0.25f,      0.0f, 1.0f, 0.0f,   0.5f, 0.0f,     //6 varf jos
         -0.25f, 0.75f, -0.25f,    0.0f, 1.0f, 0.0f,   1.0f, 1.0f,   //7
-        0.25f, 0.75f, -0.25f,     0.0f, 0.0f, 1.0f,   1.0f, 0.0f,   //8
-        -0.25f, -0.75f, -0.25f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,   //9
+        0.25f, 0.75f, -0.25f,     0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   //8
+        -0.25f, -0.75f, -0.25f,   0.0f, 1.0f, 0.0f,   0.0f, 1.0f,   //9
         0.25f,-0.75f,-0.25f,      0.0f, 1.0f, 0.0f,   0.0f, 0.0f,     //10
     };
     unsigned int indices[] = {
@@ -247,9 +246,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yOffset)
 
 int main(int argc, char** argv)
 {
-    float KaValue = 0.5;
-    float KdValue = 0.5;
-    float nValue = 8;
     std::string strFullExeFileName = argv[0];
     std::string strExePath;
     const size_t last_slash_idx = strFullExeFileName.rfind('\\');
@@ -300,22 +296,6 @@ int main(int argc, char** argv)
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    ////lamp vao
-    //glGenVertexArrays(1, &cubeVAO);
-    //glGenBuffers(1, &cubeVBO);
-
-    //glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(lampVertices), lampVertices, GL_STATIC_DRAW);
-
-    //glBindVertexArray(cubeVAO);
-
-    //// position attribute
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
-    //// normal attribute
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
-
     // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     unsigned int lightVAO;
     glGenVertexArrays(1, &lightVAO);
@@ -339,12 +319,12 @@ int main(int argc, char** argv)
 	Shader skyBoxShader("skybox.vs", "skybox.fs");
     Shader waterShader("water.vs", "water.fs");
 	skyBoxShader.SetInt("skybox", 0);
-    //lightingShader.Use();
+
+    //light Position
+    glm::vec3 lightPos(17.0f, 5.0f, 0.0f);
     
     
     glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-   // transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-   // transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     CreateVBOs();
     CreateTextures(strExePath);
 
@@ -357,6 +337,7 @@ int main(int argc, char** argv)
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindTexture(GL_TEXTURE_2D, texture1Location);
+        //Boat
         triangleShader.Use();
       
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -364,10 +345,6 @@ int main(int argc, char** argv)
 
         triangleShader.SetMat4("projection", projection);
         triangleShader.SetMat4("view", view);
-
-
-        //transform = glm::rotate(transform, deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
-
         triangleShader.SetMat4("transform", transform);
 
         glBindVertexArray(VAO);
@@ -379,6 +356,7 @@ int main(int argc, char** argv)
         lightingShader.SetVec3("objectColor", 0.0f, 0.0f, 1.0f);
         lightingShader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.SetVec3("lightPos", lightPos);
+        lightingShader.SetVec3("viewPos", camera.Position);
         lightingShader.SetMat4("projection", projection);
         lightingShader.SetMat4("view", view);
         transform = glm::rotate(glm::mat4(1.0), glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.0f));
