@@ -314,7 +314,6 @@ int main(int argc, char** argv)
 	// --------------------
 
     Shader lightingShader("light.vs", "light.fs");
-    Shader lampShader("amp.vs", "lamp.fs");
     Shader triangleShader("vertexShader.vs", "fragShader.fs");
 	Shader skyBoxShader("skybox.vs", "skybox.fs");
     Shader waterShader("water.vs", "water.fs");
