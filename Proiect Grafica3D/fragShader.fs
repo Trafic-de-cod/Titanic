@@ -1,4 +1,4 @@
-#version 400
+#version 330 core
 out vec4 out_Color;
 in vec2 TexCoord;
 uniform sampler2D texture1;
