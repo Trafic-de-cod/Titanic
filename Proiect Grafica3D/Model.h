@@ -5,9 +5,10 @@
 #include <map>
 #include <vector>
 #include "Mesh.h"
-#include "../Assimp/Importer.hpp"
-#include "../Assimp/scene.h"
-#include "../Assimp/postprocess.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 using namespace std;
 
 unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);

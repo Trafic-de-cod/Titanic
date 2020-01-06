@@ -90,12 +90,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\_external\glew-2.1.0-win32\glew-2.1.0\include;$(SolutionDir)..\_external\glfw-3.2.1.bin.WIN32\glfw-3.2.1.bin.WIN32\include\GLFW;$(SolutionDir)..\_external\glm\glm;$(SolutionDir)..\_external\stb-master;$(SolutionDir)..\_external\Assimp\include\assimp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\_external\glew-2.1.0-win32\glew-2.1.0\include;$(SolutionDir)..\_external\glfw-3.2.1.bin.WIN32\glfw-3.2.1.bin.WIN32\include\GLFW;$(SolutionDir)..\_external\glm\glm;$(SolutionDir)..\_external\stb-master;$(SolutionDir)..\_external\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\_external\glew-2.1.0-win32\glew-2.1.0\lib\Release\Win32;$(SolutionDir)..\_external\glfw-3.2.1.bin.WIN32\glfw-3.2.1.bin.WIN32\lib-vc2015;$(SolutionDir)..\_external\Assimp\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\_external\glew-2.1.0-win32\glew-2.1.0\lib\Release\Win32;$(SolutionDir)..\_external\glfw-3.2.1.bin.WIN32\glfw-3.2.1.bin.WIN32\lib-vc2015;$(SolutionDir)..\_external\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -106,10 +107,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\_external\glew-2.1.0-win32\glew-2.1.0\include;$(SolutionDir)\..\_external\glfw-3.3.1.bin.WIN64\include\GLFW;$(SolutionDir)\..\_external\glm\glm;$(SolutionDir)\..\_external\stb-master;$(SolutionDir)\..\_external\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\_external\glew-2.1.0-win32\glew-2.1.0\lib\Release\x64;$(SolutionDir)..\\_external\glfw-3.3.1.bin.WIN64\lib-vc2019;$(SolutionDir)\..\_external\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -171,6 +175,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="skybox.vs">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="titanic.fs">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="titanic.vs">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </None>
     <None Include="vertexShader.vs">

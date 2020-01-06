@@ -2,6 +2,8 @@
 //
 #include"Shader.h"
 #include "Camera.h"
+#include "Model.h"
+
 
 unsigned int texture1Location;
 
@@ -317,8 +319,11 @@ int main(int argc, char** argv)
     Shader triangleShader("vertexShader.vs", "fragShader.fs");
 	Shader skyBoxShader("skybox.vs", "skybox.fs");
     Shader waterShader("water.vs", "water.fs");
-	skyBoxShader.SetInt("skybox", 0);
+	Shader titanicShader("titanic.vs", "titanic.fs");
 
+	Model titanicModel("nanosuit/nanosuit.obj");
+	skyBoxShader.SetInt("skybox", 0);
+	
     //light Position
     glm::vec3 lightPos(17.0f, 5.0f, 0.0f);
     
@@ -370,6 +375,17 @@ int main(int argc, char** argv)
         waterShader.SetMat4("transform", transform);
         glBindVertexArray(waterVAO);
         glDrawArrays(GL_TRIANGLES, 0, 18);
+
+		//Model shader
+		titanicShader.Use();
+		titanicShader.SetMat4("projection", projection);
+		titanicShader.SetMat4("view", view);
+		// render the loaded model
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+		titanicShader.SetMat4("model", model);
+		titanicModel.Draw(titanicShader);
 
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content

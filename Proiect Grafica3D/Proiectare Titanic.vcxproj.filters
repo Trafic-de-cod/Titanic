@@ -64,5 +64,11 @@
     <None Include="light.fs">
       <Filter>Fragment Shaders</Filter>
     </None>
+    <None Include="titanic.fs">
+      <Filter>Fragment Shaders</Filter>
+    </None>
+    <None Include="titanic.vs">
+      <Filter>Vertex Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
