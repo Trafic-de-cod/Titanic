@@ -28,15 +28,14 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 float skyboxVertices[] = {
-    -1.f, -1.f, -1.f, //0
-    1.f,-1.f,-1.f,    //1
-    1.f,-1.f,1.f,     //2
-    -1.f, -1.f, 1.f,  //3
-                      
-    -1.f, 1.f, -1.f,  //4
-    1.f,1.f,-1.f,     //5
-    1.f,1.f,1.f,      //6
-    -1.f,1.f,1.f,     //7
+    1,1,1,
+	1,-1,1,
+	1,1,-1,
+	1,-1,-1,
+	-1,-1,-1,
+	-1,1,-1,
+	-1,-1,1,
+	-1,1,1
 };
 
 float waterVertices[] =
@@ -54,32 +53,32 @@ unsigned int skyboxIndices[] =
 {
     //BOTTOM
     0,1,3,
-    1,2,3,
+    3,2,0,
     //LEFT
-    0,3,4,
-    3,4,7,
+    0,1,7,
+    7,6,1,
     //TOP
-    4,5,7,
-    5,6,7,
+    1,3,6,
+    6,4,3,
     //RIGHT
-    1,2,5,
-    2,5,6,
+    3,2,4,
+    4,2,5,
     //FRONT
-    0,1,4,
-    1,4,5,
+    5,4,6,
+    6,5,7,
     //BACK
-    2,3,6,
-    3,6,7
+    7,5,2,
+    2,0,7
 };
 
 std::vector<std::string> faces
 {
-	"sea_rt.JPG",
-	"sea_lf.JPG",
-	"sea_up.JPG",
-	"sea_dn.JPG",
-	"sea_bk.JPG",
-	"sea_ft.JPG"
+	"lagoon_rt.tga",
+	"lagoon_lf.tga",
+	"lagoon_up.tga",
+	"lagoon_dn.tga",
+	"lagoon_bk.tga",
+	"lagoon_ft.tga"
 };
 
 unsigned int loadCubemap(std::vector<std::string> faces)
@@ -105,8 +104,8 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 			stbi_image_free(data);
 		}
 	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -309,11 +308,14 @@ int main(int argc, char** argv)
 	Shader titanicShader("titanic.vs", "titanic.fs");
     Shader icebergShader("Iceberg.vs", "Iceberg.fs");
 	Shader whaleShader("whale.vs", "whale.fs");
+	Shader gullShader("Gull.vs", "Gull.fs");
 
 	Model titanicModel("Cruisership 2012/NewScaleCruiser.obj");
     Model waterModel("Ocean obj/Ocean.obj");
     Model icebergModel("Iceberg/iceberg.obj");
 	Model whaleModel("Whale/Whale.obj");
+	Model gullModel("Gull3/seagull.obj");
+
 	skyBoxShader.SetInt("skybox", 0);
 	
     //light Position
@@ -390,6 +392,12 @@ int main(int argc, char** argv)
 		whaleShader.SetMat4("view", view);
 		whaleShader.SetMat4("transform", transform);
 		whaleModel.Draw(whaleShader);
+		//draw gull
+		gullShader.Use();
+		gullShader.SetMat4("projection", projection);
+		gullShader.SetMat4("view", view);
+		gullShader.SetMat4("transform", transform);
+		gullModel.Draw(gullShader);
 
 
 		// draw skybox as last

@@ -82,5 +82,11 @@
     <None Include="whale.vs">
       <Filter>Vertex Shaders</Filter>
     </None>
+    <None Include="Gull.fs">
+      <Filter>Fragment Shaders</Filter>
+    </None>
+    <None Include="Gull.vs">
+      <Filter>Vertex Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
