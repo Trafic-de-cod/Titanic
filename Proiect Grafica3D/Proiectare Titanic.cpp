@@ -310,7 +310,7 @@ int main(int argc, char** argv)
     Shader icebergShader("Iceberg.vs", "Iceberg.fs");
 
 	Model titanicModel("Cruisership 2012/NewScaleCruiser.obj");
-    Model waterModel("Ocean/Ocean.obj");
+    Model waterModel("Ocean obj/Ocean.obj");
     Model icebergModel("Iceberg/iceberg.obj");
 	skyBoxShader.SetInt("skybox", 0);
 	
