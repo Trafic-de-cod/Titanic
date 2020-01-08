@@ -43,7 +43,7 @@ private:
 	{
 		// read file via ASSIMP
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 		// check for errors
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 		{
@@ -109,17 +109,19 @@ private:
 				vertex.TexCoords = vec;
 			}
 			else
+			{
 				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-			// tangent
-			vector.x = mesh->mTangents[i].x;
-			vector.y = mesh->mTangents[i].y;
-			vector.z = mesh->mTangents[i].z;
-			vertex.Tangent = vector;
-			// bitangent
-			vector.x = mesh->mBitangents[i].x;
-			vector.y = mesh->mBitangents[i].y;
-			vector.z = mesh->mBitangents[i].z;
-			vertex.Bitangent = vector;
+			}
+			//// tangent
+			//vector.x = mesh->mTangents[i].x;
+			//vector.y = mesh->mTangents[i].y;
+			//vector.z = mesh->mTangents[i].z;
+			//vertex.Tangent = vector;
+			//// bitangent
+			//vector.x = mesh->mBitangents[i].x;
+			//vector.y = mesh->mBitangents[i].y;
+			//vector.z = mesh->mBitangents[i].z;
+			//vertex.Bitangent = vector;
 			vertices.push_back(vertex);
 		}
 		// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
@@ -132,14 +134,8 @@ private:
 		}
 		// process materials
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		// we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-		// as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-		// Same applies to other texture as the following list summarizes:
-		// diffuse: texture_diffuseN
-		// specular: texture_specularN
-		// normal: texture_normalN
-
-		// 1. diffuse maps
+		aiColor3D color;
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
 		vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 		// 2. specular maps
@@ -151,6 +147,15 @@ private:
 		// 4. height maps
 		std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 		textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+		
+		// we assume a convention for sampler names in the shaders. Each diffuse texture should be named
+		// as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
+		// Same applies to other texture as the following list summarizes:
+		// diffuse: texture_diffuseN
+		// specular: texture_specularN
+		// normal: texture_normalN
+
+		// 1. diffuse maps
 
 		// return a mesh object created from the extracted mesh data
 		return Mesh(vertices, indices, textures);

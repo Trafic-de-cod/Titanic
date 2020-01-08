@@ -1,14 +1,14 @@
 // Proiectare Titanic.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-#include"Shader.h"
 #include "Camera.h"
+#include"Shader.h"
 #include "Model.h"
 
 
 unsigned int texture1Location;
 
 unsigned int VBO, VAO, IndBO;
-unsigned int skyboxVAO, skyboxVBO, skyboxIBO;
+GLuint skyboxVAO, skyboxVBO, skyboxIBO;
 unsigned int waterVBO, waterVAO;
 unsigned int cubeVBO, cubeVAO;
 unsigned int lightVAO;
@@ -18,7 +18,7 @@ const unsigned int SCR_WIDTH = 1900;
 const unsigned int SCR_HEIGHT = 1000;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 2.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -269,8 +269,8 @@ int main(int argc, char** argv)
     glfwSetFramebufferSizeCallback(win, framebuffer_size_callback);
     glfwSetCursorPosCallback(win, mouse_callback);
     glfwSetScrollCallback(win, scroll_callback);
-    glewInit();
     glEnable(GL_DEPTH_TEST);
+    glewInit();
 
 	// skybox VAO
 
@@ -285,20 +285,7 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    //water vao
-    glGenVertexArrays(1, &waterVAO);
-    glGenBuffers(1, &waterVBO);
-    glBindVertexArray(waterVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, waterVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(waterVertices), waterVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9*sizeof(float), 0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9*sizeof(float),(void*)(3*sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+     //second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
     unsigned int lightVAO;
     glGenVertexArrays(1, &lightVAO);
     glBindVertexArray(lightVAO);
@@ -320,8 +307,11 @@ int main(int argc, char** argv)
 	Shader skyBoxShader("skybox.vs", "skybox.fs");
     Shader waterShader("water.vs", "water.fs");
 	Shader titanicShader("titanic.vs", "titanic.fs");
+    Shader icebergShader("Iceberg.vs", "Iceberg.fs");
 
-	Model titanicModel("nanosuit/nanosuit.obj");
+	Model titanicModel("Cruisership 2012/NewScaleCruiser.obj");
+    Model waterModel("Ocean/Ocean.obj");
+    Model icebergModel("Iceberg/iceberg.obj");
 	skyBoxShader.SetInt("skybox", 0);
 	
     //light Position
@@ -329,6 +319,10 @@ int main(int argc, char** argv)
     
     
     glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+	glm::mat4 modelMat = glm::mat4(1.0f);
+    glm::mat4 waterMat = glm::mat4(1.0f);
+    glm::mat4 icebergMat = glm::mat4(1.0f);
+
     CreateVBOs();
     CreateTextures(strExePath);
 
@@ -338,54 +332,57 @@ int main(int argc, char** argv)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(win);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.5f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindTexture(GL_TEXTURE_2D, texture1Location);
         //Boat
         triangleShader.Use();
-      
+       //
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-
+       
         triangleShader.SetMat4("projection", projection);
         triangleShader.SetMat4("view", view);
         triangleShader.SetMat4("transform", transform);
+       
+       // glBindVertexArray(VAO);
+       // glActiveTexture(GL_TEXTURE0);
 
-        glBindVertexArray(VAO);
-        glActiveTexture(GL_TEXTURE0);
-
-        glDrawElements(GL_TRIANGLES, 3*17, GL_UNSIGNED_INT, 0);
-       //LIGHT
-        lightingShader.Use();
-        lightingShader.SetVec3("objectColor", 0.0f, 0.0f, 1.0f);
-        lightingShader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        lightingShader.SetVec3("lightPos", lightPos);
-        lightingShader.SetVec3("viewPos", camera.Position);
-        lightingShader.SetMat4("projection", projection);
-        lightingShader.SetMat4("view", view);
-        transform = glm::rotate(glm::mat4(1.0), glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.0f));
-        lightingShader.SetMat4("model", transform);
-        glBindVertexArray(waterVAO);
-        
-
-        //draw water
-        //waterShader.Use();
-        waterShader.SetMat4("projection", projection);
-        waterShader.SetMat4("view", view);
-        waterShader.SetMat4("transform", transform);
-        glBindVertexArray(waterVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 18);
+       // glDrawElements(GL_TRIANGLES, 3*17, GL_UNSIGNED_INT, 0);
+       ////LIGHT
+       // lightingShader.Use();
+       // lightingShader.SetVec3("objectColor", 0.0f, 0.0f, 1.0f);
+       // lightingShader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
+       // lightingShader.SetVec3("lightPos", lightPos);
+       // lightingShader.SetVec3("viewPos", camera.Position);
+       // lightingShader.SetMat4("projection", projection);
+       // lightingShader.SetMat4("view", view);
+       // transform = glm::rotate(glm::mat4(1.0), glm::radians(-90.f), glm::vec3(0.0f, 1.0f, 0.0f));
+       // lightingShader.SetMat4("model", transform);
+       // glBindVertexArray(waterVAO);
+       // 
+       //
 
 		//Model shader
-		titanicShader.Use();
 		titanicShader.SetMat4("projection", projection);
 		titanicShader.SetMat4("view", view);
-		// render the loaded model
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-		titanicShader.SetMat4("model", model);
+        modelMat = glm::rotate(transform, glm::radians(60.f), glm::vec3(0.0f, 1.0f, 0.0f));
+		titanicShader.SetMat4("model", modelMat);
+		titanicShader.Use();
 		titanicModel.Draw(titanicShader);
+        //draw water
+        waterShader.Use();
+        waterShader.SetMat4("projection", projection);
+        waterShader.SetMat4("view", view);
+        waterShader.SetMat4("transform", waterMat);
+        waterModel.Draw(waterShader);
+        //draw iceberg
+        icebergShader.Use();
+        icebergShader.SetMat4("projection", projection);
+        icebergShader.SetMat4("view", view);
+        icebergShader.SetMat4("transform", icebergMat);
+        icebergModel.Draw(icebergShader);
+
 
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -399,7 +396,7 @@ int main(int argc, char** argv)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glDrawElements(GL_TRIANGLES, 3 * 12, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+        glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
 
         glfwSwapBuffers(win);

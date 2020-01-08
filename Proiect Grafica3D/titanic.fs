@@ -1,11 +1,11 @@
 #version 330 core
-out vec4 FragColor;
+out vec4 TitanicFragColor;
 
-in vec2 TexCoords;
+in vec2 TitanicTexCoords;
 
 uniform sampler2D texture_diffuse1;
 
 void main()
 {    
-    FragColor = texture(texture_diffuse1, TexCoords);
+    TitanicFragColor = texture(texture_diffuse1, TitanicTexCoords);
 }

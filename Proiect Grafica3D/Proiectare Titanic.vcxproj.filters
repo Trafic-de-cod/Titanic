@@ -70,5 +70,11 @@
     <None Include="titanic.vs">
       <Filter>Vertex Shaders</Filter>
     </None>
+    <None Include="Iceberg.vs">
+      <Filter>Vertex Shaders</Filter>
+    </None>
+    <None Include="Iceberg.fs">
+      <Filter>Fragment Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
