@@ -308,10 +308,12 @@ int main(int argc, char** argv)
     Shader waterShader("water.vs", "water.fs");
 	Shader titanicShader("titanic.vs", "titanic.fs");
     Shader icebergShader("Iceberg.vs", "Iceberg.fs");
+	Shader whaleShader("whale.vs", "whale.fs");
 
 	Model titanicModel("Cruisership 2012/NewScaleCruiser.obj");
     Model waterModel("Ocean obj/Ocean.obj");
     Model icebergModel("Iceberg/iceberg.obj");
+	Model whaleModel("Whale/Whale.obj");
 	skyBoxShader.SetInt("skybox", 0);
 	
     //light Position
@@ -382,6 +384,12 @@ int main(int argc, char** argv)
         icebergShader.SetMat4("view", view);
         icebergShader.SetMat4("transform", icebergMat);
         icebergModel.Draw(icebergShader);
+		//draw whale
+		whaleShader.Use();
+		whaleShader.SetMat4("projection", projection);
+		whaleShader.SetMat4("view", view);
+		whaleShader.SetMat4("transform", transform);
+		whaleModel.Draw(whaleShader);
 
 
 		// draw skybox as last

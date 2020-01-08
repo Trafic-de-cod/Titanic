@@ -76,5 +76,11 @@
     <None Include="Iceberg.fs">
       <Filter>Fragment Shaders</Filter>
     </None>
+    <None Include="whale.fs">
+      <Filter>Fragment Shaders</Filter>
+    </None>
+    <None Include="whale.vs">
+      <Filter>Vertex Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
